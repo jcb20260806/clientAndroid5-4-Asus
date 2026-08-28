@@ -20,7 +20,24 @@ fun getValue(html: String, name: String): String? {
 
     return html.substring(valueStart, valueEnd).trim()
 }
+val jcbListOfCapteurs =listOf(
+    listOf("AirTemp", "Temp: "," °C<br>"),
+    listOf("Humidité","Hum: "," %<br>"),
+    listOf("Eau Temp",  "Temp eau: "," °C<br>"),
+    listOf("Pression","Pression: "," hPa<br>"),
+    listOf("PoolHTemp", "Temp BMP: "," °C<br>")
 
+);
+
+
+fun jcbGetValue(html: String,Capteur : List<String>) {
+    val position = texte.indexOf("Temp eau:")
+    val debut = texte.indexOf(":") + 1
+    val fin = texte.indexOf("°")
+
+    val temperature = texte.substring(debut, fin).trim()
+
+}
 class MainActivity : AppCompatActivity() {
 
 

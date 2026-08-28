@@ -10,10 +10,11 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import android.util.Log // jcb pour log html
 fun getValue(html: String, name: String): String? {
-    val start = html.indexOf("%$name=")
+    val startTag = "%$name="
+    val start = html.indexOf(startTag)
     if (start == -1) return null
 
-    val valueStart = start + name.length + 2
+    val valueStart = start + startTag.length
     val valueEnd = html.indexOf("_", valueStart)
 
     if (valueEnd == -1) return null
@@ -27,16 +28,25 @@ val jcbListOfCapteurs =listOf(
     listOf("Pression","Pression: "," hPa<br>"),
     listOf("PoolHTemp", "Temp BMP: "," °C<br>")
 
-);
+)
 
 
-fun jcbGetValue(html: String,Capteur : List<String>) {
-    val position = texte.indexOf("Temp eau:")
-    val debut = texte.indexOf(":") + 1
-    val fin = texte.indexOf("°")
+fun jcbGetValue(html: String, Capteur: List<String>): String {
+    val startTag = Capteur[1]
+    val endTag = Capteur[2]
 
-    val temperature = texte.substring(debut, fin).trim()
+    val startPos = html.indexOf(startTag)
+    if (startPos == -1) return "${Capteur[0]} = non trouvé"
 
+    val debut = startPos + startTag.length
+    // On cherche la fin APRES le début de la valeur pour éviter de trouver une balise précédente
+    val fin = html.indexOf(endTag, debut)
+
+    if (fin == -1) return "${Capteur[0]} = format inconnu"
+
+    val CapteurValue = html.substring(debut, fin).trim()
+
+    return "${Capteur[0]} = $CapteurValue"
 }
 class MainActivity : AppCompatActivity() {
 
@@ -63,60 +73,29 @@ class MainActivity : AppCompatActivity() {
             txtResult.text = "Requête vers $url ..."
 
             val request = Request.Builder().url(url).build()
-            // log request
-            Log.d("HTTP_REQUEST", "URL exacte : ${request.url}")
+                        Log.d("HTTP_REQUEST", "URL exacte : ${request.url}")
             Log.d("HTTP_REQUEST", "Méthode : ${request.method}")
             Log.d("HTTP_REQUEST", "Headers : ${request.headers}")
             // log request
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    runOnUiThread {"BMPSLPressure")
-                    val dj1Temp = getValue(body, "DJ1Temp")
-                    val resetSec = getValue(body, "ResetSec")
-                    val forecast = getValue(body, "ForeCast")
-                    Log.d("DEBUG", "Pression = $bmpPressure")
+                    runOnUiThread {
                         txtResult.text = "ERREUR:\n${e.message}\n\n1. Même WiFi ?\n2. IP correcte ?\n3. ESP32 allumé ?"
                     }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
                     val body = response.body?.string() ?: "Vide"
-                    val espTime = getValue(body, "ESPTime")
-                    val dhtTemp = getValue(body, "Temp BMP")
-                    val dhtHumidity = getValue(body, "DHTHumidity")
-                    val bmpTemp = getValue(body, "Temp BMP")
-                    val bmpPressure = getValue(body, "BMPPressure")
-                    val bmpSLPressure = getValue(body, "BMPSLPressure")
-                    val dj1Temp = getValue(body, "DJ1Temp")
-                    val resetSec = getValue(body, "ResetSec")
-                    val forecast = getValue(body, "ForeCast")
-                    Log.d("DEBUG", "Pression = $bmpPressure")
-
-                    println("Heure       = $espTime")
-                    println("DHT Temp    = $dhtTemp")
-                    println("Humidité    = $dhtHumidity")
-                    println("BMP Temp    = $bmpTemp")
-                    println("Pression    = $bmpPressure")
-                    println("Pression SL = $bmpSLPressure")
-                    println("DJ1 Temp    = $dj1Temp")
-                    println("Reset Sec   = $resetSec")
-                    println("Prévision   = $forecast")
                     runOnUiThread {
 
                         var Result: String = ""
-                        //Result += "Heure       = $espTime\n"
-                        //Result +="DHT Temp    = $dhtTemp\n"
-                        //Result +="Humidité    = $dhtHumidity\n"
+                        for (c in jcbListOfCapteurs) {
+                            val v: String = jcbGetValue(body, c)
+                            Result += "$v \n"
+                        }
 
-                        Result +="BMP Temp    = $bmpTemp\n"
-                        Result +="Pression    = $bmpPressure\n"
-                        Result +="Pression SL = $bmpSLPressure\n"
-                        Result +="DJ1 Temp    = $dj1Temp\n"
-
-                        //Result +="Reset Sec   = $resetSec\n"
-                        //Result +="Prévision   = $forecast\n"
-                        Result += body
+                        // Result += body // inutile d' ajouter la source
                         txtResult.text = Result //"HTTP ${response.code}\n\n$body"
                     }
                 }

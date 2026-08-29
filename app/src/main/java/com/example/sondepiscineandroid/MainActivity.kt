@@ -9,18 +9,10 @@ import okhttp3.*
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import android.util.Log // jcb pour log html
-fun getValue(html: String, name: String): String? {
-    val startTag = "%$name="
-    val start = html.indexOf(startTag)
-    if (start == -1) return null
-
-    val valueStart = start + startTag.length
-    val valueEnd = html.indexOf("_", valueStart)
-
-    if (valueEnd == -1) return null
-
-    return html.substring(valueStart, valueEnd).trim()
-}
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+// pour l'
 val jcbListOfCapteurs =listOf(
     listOf("AirTemp", "Temp: "," °C<br>"),
     listOf("Humidité","Hum: "," %<br>"),
@@ -63,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         val editIp = findViewById<EditText>(R.id.editIp)
         val editEndpoint = findViewById<EditText>(R.id.editEndpoint)
         val txtResult = findViewById<TextView>(R.id.txtResult)
+        val txtResult2 = findViewById<TextView>(R.id.txtResult2)
         val btnGo = findViewById<Button>(R.id.btnGo)
 
         btnGo.setOnClickListener {
@@ -96,7 +89,15 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         // Result += body // inutile d' ajouter la source
-                        txtResult.text = Result //"HTTP ${response.code}\n\n$body"
+                        txtResult2.text = Result
+                        val heure = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                            .format(Date())//"HTTP ${response.code}\n\n$body"
+                        txtResult.text = "Last Update at $heure"
+
+                        // Wait 1 second and refresh by triggering the button click again
+                        btnGo.postDelayed({
+                            btnGo.performClick()
+                        }, 20000)
                     }
                 }
             })

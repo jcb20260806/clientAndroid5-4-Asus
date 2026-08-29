@@ -29,12 +29,22 @@
     <TextView
         android:id="@+id/txtResult"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="2dp"
         android:layout_weight="1"
         android:layout_marginTop="16dp"
         android:background="#EEEEEE"
         android:padding="12dp"
         android:text="Résultat ici..."
+        android:fontFamily="monospace" />
+    <TextView
+        android:id="@+id/txtResult2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:background="#EEEEEE"
+        android:padding="12dp"
+        android:text="Résultat2..."
         android:fontFamily="monospace" />
 
 </LinearLayout>

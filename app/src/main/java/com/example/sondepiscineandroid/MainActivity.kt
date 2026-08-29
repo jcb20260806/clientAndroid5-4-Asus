@@ -12,7 +12,8 @@ import android.util.Log // jcb pour log html
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-// pour l'
+// pour affichage permanent
+import android.view.WindowManager
 val jcbListOfCapteurs =listOf(
     listOf("AirTemp", "Temp: "," °C<br>"),
     listOf("Humidité","Hum: "," %<br>"),
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_main)
 
         val editIp = findViewById<EditText>(R.id.editIp)

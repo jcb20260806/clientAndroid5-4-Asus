@@ -14,6 +14,7 @@ import java.util.Date
 import java.util.Locale
 // pour affichage permanent
 import android.view.WindowManager
+import android.net.wifi.WifiManager
 val jcbListOfCapteurs =listOf(
     listOf("AirTemp", "Temp: "," °C<br>"),
     listOf("Humidité","Hum: "," %<br>"),
@@ -59,6 +60,18 @@ class MainActivity : AppCompatActivity() {
         val txtResult = findViewById<TextView>(R.id.txtResult)
         val txtResult2 = findViewById<TextView>(R.id.txtResult2)
         val btnGo = findViewById<Button>(R.id.btnGo)
+        //
+        //pour ssid et bssid
+        val wifiManager =
+            applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
+
+        val wifiInfo = wifiManager.connectionInfo
+
+        val ssid = wifiInfo.ssid
+        val bssid = wifiInfo.bssid
+
+        println("SSID  = $ssid")
+        println("BSSID = $bssid")
 
         btnGo.setOnClickListener {
             val ip = editIp.text.toString().trim()
@@ -94,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                         txtResult2.text = Result
                         val heure = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
                             .format(Date())//"HTTP ${response.code}\n\n$body"
-                        txtResult.text = "Last Update at $heure"
+                        txtResult.text = "Last Update at $heure From BSSID = $bssid"
 
                         // Wait 1 second and refresh by triggering the button click again
                         btnGo.postDelayed({

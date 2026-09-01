@@ -108,11 +108,12 @@ class MainActivity : AppCompatActivity() {
                         val heure = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
                             .format(Date())//"HTTP ${response.code}\n\n$body"
                         txtResult.text = "Last Update at $heure From BSSID = $bssid"
+                        val rdEditText = findViewById<EditText>(R.id.RepeatDealy)
+                        val delay = rdEditText.text.toString().toLongOrNull() ?: 1000L
 
-                        // Wait 1 second and refresh by triggering the button click again
                         btnGo.postDelayed({
                             btnGo.performClick()
-                        }, 20000)
+                        }, delay)
                     }
                 }
             })
